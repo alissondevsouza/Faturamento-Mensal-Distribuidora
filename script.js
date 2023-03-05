@@ -1,103 +1,122 @@
 
 
-let faturamentos = []
-let maiorPreco = []
-let menorPreco = []
-let faturmaneotsSemzero = []
-let somaMedia;
-let teste = [2, 3, 4, 5, 5]
-let diasMaior = []
-let diasLucro = []
-let totalDias 
-let divisorMédia
-let qtdDias = []
+let invoicingValue = []
+let invoicingBigger = []
+let invoicingSmall = []
+let invoicingNotZero = []
+let valueBiggerObject = []
+let valuesSmallObject = []
+let averageDivisor
+let daysBiggerInvoicing = []
+let totaldays
 
+// CAPTURA DE DADOS DO ARQUIVO JSON 
 fetch("assets/dados.json").then((response) => {
-    response.json().then((dadosJson) => {
-        let faturamentosJson = dadosJson
-        let i 
+    response.json().then((dataJson) => {
+        let invoicingJson = dataJson
 
 
-        for ( i = 0; i < Object.keys(faturamentosJson).length; i++ ){
-            faturamentos[i] = faturamentosJson[i].valor
+// LÓGICA PARA CALCULAR O MAIOR FATURAMENTO OCORRIDO NO MÊS
+
+        // LISTANDO TODOS VALORES DO MÊS
+        for ( i = 0; i < Object.keys(invoicingJson).length; i++ ){
+            invoicingValue[i] = invoicingJson[i].valor
         }
 
-        let faturamentoMaior = biggerValue(faturamentos)
-        
-        
-        for (y=0; y <  Object.keys(faturamentos).length; y++){
-            if( faturamentos[y] > 0){
-                faturmaneotsSemzero[y] = faturamentos[y]
+        // MÉTODO PARA RESGATAR O MAIOR VALOR DO MÊS
+        let invoicingBigger = biggerValue(invoicingValue)
+
+        // VARRENDO O ARRAY PARA ENCONTRAR O MÊS DO MAIOR VALOR
+        for (x=0; x < Object.keys(invoicingJson).length; x++){
+            if (invoicingBigger == invoicingJson[x].valor){
+                valueBiggerObject = invoicingJson[x]
             }
         }
-        let faturamentoMenor = smallValue(faturmaneotsSemzero)
-        
-        divisorMédia = Object.keys(faturmaneotsSemzero).length
 
-        for ( z = 0; z < Object.keys(faturmaneotsSemzero).length; z++ ){
-            if (faturamentoMenor == faturamentosJson[z].valor){
-                menorPreco = faturamentosJson[z]
+        // CAPTURANDO O VALOR E TRANSFORMANDO PARA O FORMATO DA MOEDA REAIS R$
+        let valueBigger = valueBiggerObject.valor
+        let reaisValueBigger = valueBigger.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+
+        // EXIBINDO NO HTML
+        document.getElementById('valuesInvoicingBigger').innerHTML = reaisValueBigger
+
+        
+// LÓGICA PARA CALCULAR O MENOR FATURAMENTO OCORRIDO NO MÊS
+        
+        // LISTANDO OS VALORES DOS DIAS COM FATURAMENTO
+        for (y=0; y <  Object.keys(invoicingValue).length; y++){
+            if( invoicingValue[y] > 0){
+                invoicingNotZero[y] = invoicingValue[y]
             }
         }
+
+        // MÉTODO PARA RESGATAR O MENOR VALOR DO MÊS
+        let invoicingSmall = smallValue(invoicingNotZero)
+        averageDivisor = Object.keys(invoicingNotZero).length
+
+        // VARRENDO O ARRAY PARA ENCONTRAR O MÊS DE MENOR VALOR
+        for ( z = 0; z < Object.keys(invoicingNotZero).length; z++ ){
+            if (invoicingSmall == invoicingJson[z].valor){
+                valuesSmallObject = invoicingJson[z]
+            }
+        }
+
+        // CAPTURANDO O VALOR E TRANSFORMANDO PARA O FORMATO DA MOEDA REAIS R$
+        let valuesSmall = valuesSmallObject.valor
+        let reaisValuesSmall = valuesSmall.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+
+        // EXIBINDO NO HTML
+        document.getElementById('valuesInvoicingSmall').innerHTML = reaisValuesSmall
+
   
-        for (x=0; x < Object.keys(faturamentosJson).length; x++){
-            if (faturamentoMaior == faturamentosJson[x].valor){
-                maiorPreco = faturamentosJson[x]
+// LÓGICA PARA CALCULAR A MÉDIA DE FATURAMENTO DO MÊS
+
+        // MÉTODO PARA CALCULAR A MÉDIA DE FATURAMENTO
+        let average = averageValues(invoicingValue) 
+
+        // CAPTURANDO O VALOR E TRANSFORMANDO PARA O FORMATO DA MOEDA REAIS R$
+        let reaisAverage = average.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
+
+        // EXIBINDO NO HTML
+        document.getElementById('daysBigger').innerHTML = reaisAverage
+
+
+// LÓGICA PARA CALCULAR O TOTAL DE DIAS QUE O FATURAMENTO FOI MAIOR QUE A MÉIDA MENSAL
+
+        // LISTANDO FATURMANETOS MAIOR QUE A MÉDIA MENSAL
+        for ( d = 0; d < Object.keys(invoicingJson).length; d++){
+            if ( average < invoicingJson[d].valor){
+                daysBiggerInvoicing[d] = invoicingJson[d]
             }
         }
 
-       
-        let precoMaior = maiorPreco.valor
-        let precoMaiorReais = precoMaior.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
-        let diaMaior = maiorPreco.dia
+        // LENDO QUANDIDADE DE DIAS
+        totaldays = Object.keys(daysBiggerInvoicing).length
 
-        let precoMenor = menorPreco.valor
-        let precoMenorReais = precoMenor.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
-        let diaMenor = menorPreco.dia
-
-        document.getElementById('valuesInvoicingBigger').innerHTML = precoMaiorReais
-        //document.getElementById('dia').innerHTML = dia
-
-        document.getElementById('valuesInvoicingSmall').innerHTML = precoMenorReais
-       // document.getElementById('diaMenor').innerHTML = diaMenor
-
-
-        
-
-        let media = averageValues(faturamentos) 
-    
-        let mediaReais = media.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'})
-
-        document.getElementById('daysBigger').innerHTML = mediaReais
-
-
-        for ( d = 0; d < Object.keys(faturamentosJson).length; d++){
-            if ( media < faturamentosJson[d].valor){
-                qtdDias[d] = faturamentosJson[d]
-            }
-        }
-
-        totalDias = Object.keys(qtdDias).length
-
-        document.getElementById('amountDays').innerHTML = totalDias
+        // EXIBINDO NO HTML
+        document.getElementById('amountDays').innerHTML = totaldays   
 
     })
 })
 
+// MÉTODOS
 
+// MÉTODO PARA CALCULAR MAIOR VALOR
 const biggerValue = (data) => {
     let bigger = data.reduce((valueOne, valueTwo) => valueOne > valueTwo ? valueOne : valueTwo)
     return bigger
 }
 
+// MÉTODO PARA CALCULAR MENOR VALOR
 const smallValue = (data) => {
     let small = data.reduce((valueOne, valueTwo) => valueOne < valueTwo ? valueOne : valueTwo)
     return small
 }
 
+// MÉTODO PARA CALCULAR A MÉDIA
 const averageValues = (data) => {
     let average = data.reduce((valueOne, valueTwo) =>  valueOne + valueTwo)
-    return average / divisorMédia
+    return average / averageDivisor
 }
 
 
